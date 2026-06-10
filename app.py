@@ -1,3 +1,4 @@
+import anthropic
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -221,3 +222,31 @@ table_display["date"] = table_display["date"].dt.strftime("%d %b %Y")
 table_display["amount"] = table_display["amount"].apply(lambda x: f"€{x:+,.2f}")
 table_display.columns = ["Date", "Description", "Category", "Amount"]
 st.dataframe(table_display, use_container_width=True, hide_index=True, height=350)
+# ── AI Insights ───────────────────────────────────────────────────────────────
+st.subheader("🤖 AI Insights")
+
+api_key = st.text_input("Enter your Anthropic API key to get AI insights", type="password", placeholder="sk-ant-...")
+
+if api_key and len(exp_view) > 0:
+    if st.button("Generate insights"):
+        summary = exp_view.groupby("category")["amount_abs"].sum().sort_values(ascending=False).to_string()
+        prompt = f"""Analyze this person's spending data and give 3-4 short, specific, friendly insights and tips.
+        
+Total income: €{total_income:.0f}
+Total expenses: €{total_expenses:.0f}
+Net savings: €{net_savings:.0f}
+Savings rate: {savings_rate:.0f}%
+
+Spending by category:
+{summary}
+
+Keep it conversational, specific with numbers, and actionable."""
+
+        with st.spinner("Analyzing your finances..."):
+            client = anthropic.Anthropic(api_key=api_key)
+            message = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=1000,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            st.success(message.content[0].text)
