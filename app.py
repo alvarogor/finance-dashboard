@@ -245,7 +245,7 @@ Keep it conversational, specific with numbers, and actionable."""
         with st.spinner("Analyzing your finances..."):
             client = anthropic.Anthropic(api_key=api_key)
             message = client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-haiku-4-5-20251001",
                 max_tokens=1000,
                 messages=[{"role": "user", "content": prompt}]
             )
