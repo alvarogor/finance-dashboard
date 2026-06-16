@@ -225,7 +225,7 @@ st.dataframe(table_display, use_container_width=True, hide_index=True, height=35
 # ── AI Insights ───────────────────────────────────────────────────────────────
 st.subheader("🤖 AI Insights")
 
-api_key = st.text_input("Enter your Anthropic API key to get AI insights", type="password", placeholder="sk-ant-...")
+api_key = st.secrets.get("ANTHROPIC_API_KEY", "")
 
 if api_key and len(exp_view) > 0:
     if st.button("Generate insights"):
